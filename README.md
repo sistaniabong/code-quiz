@@ -38,7 +38,7 @@ This password generator application includes the following features:
 
 ## Mock-Up
 The following GIF displays the web application's appearance and functionality:
-
+![code quiz demo](./assets/images/code-quiz.gif)
 
 
 ## Review
