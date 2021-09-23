@@ -90,6 +90,14 @@ var questions = [
 var questionCount = 0;
 function renderQuestion(){
 
+    // persist the result footer for 500ms on the next question page
+    if (document.getElementsByClassName("result-footer")[0] !== undefined){
+        setTimeout(function(){ 
+            console.log('run this');
+            resultFooter.innerHTML="";
+        }, 300);
+    }
+
     // checking if there's any question left
     if (questions[questionCount] === undefined){
         // if all questions have been answered, set the isFinished stasus to true
@@ -100,12 +108,6 @@ function renderQuestion(){
         chosenQuestion = questions[questionCount];
     }
 
-    // persist the result footer for 500ms on the next question page
-    if (document.getElementsByClassName("result-footer")[0] !== undefined){
-        setTimeout(function(){ 
-            document.getElementsByClassName("result-footer")[0].style.display="none";
-        }, 500);
-    }
     main.appendChild(questionEl); // appending the question element inside main
     h2QuestEl.textContent = chosenQuestion.question; //appending the question to the h2
 
@@ -130,56 +132,53 @@ function renderQuestion(){
 // function to render the score
 function renderScore(){
     // resetting the page
-    main.innerHTML = "";
+    questionEl.innerHTML = "";
 
     // adding content to the score page
     h3Result.textContent = "You have completed the quiz!";
     pResult.textContent = "Your score is " + timeLeft;
 
+    // input field to enter initial
     var initialInput = document.createElement("input");
     initialInput.setAttribute("id","myInitial")
     initialInput.setAttribute("value", "Enter your initial here...")
     
-
+    // submit button 
     iniButt.className = "initials-button";
     iniButt.textContent = "Submit";
 
-    resultEl.append(h3Result);
-    resultEl.append(pResult);
-    resultEl.append(initialInput);
-    resultEl.append(iniButt);
+    resultEl.append(h3Result, pResult, initialInput, iniButt);
     main.appendChild(resultEl); 
 }
 
 
 
 
-// Function startGame() to start the timer and call the function that render the question
 var timeLeft = 60;
-
+// Function startGame() to start the timer and call the function that render the question
 function startGame(){
     // disable the start button when the timer is still going
     isFinished = false
     headerIntro.style.display = "none";
 
+    // call renderQuestion() to render the question
     renderQuestion();
 
+    // run timer
     var timeInterval = setInterval(function(){
         timeLeft--;
-
         timerDisplay.textContent = timeLeft;
 
         // Check is the time has run out or if all the questions have been answered
         if (isFinished || timeLeft === 0){
             clearInterval(timeInterval);
             renderScore(); // call renderScore() to display the score and submit initials
-
         }
     }, 1000);
     
 }
 
-
+// fx to check whether the selected answer is correct or wrong
 function checkAnswers(answer){
     console.log('correct answer: ' + chosenQuestion.correctAns);
 
@@ -187,22 +186,19 @@ function checkAnswers(answer){
         if (chosenQuestion.correctAns == answer){
             console.log('You are CORRECT!');
             resultFooter.textContent = 'You are CORRECT!';
-            main.appendChild(resultFooter);
         }else {
             //if not correct substract 15sec from timeLeft and assign timeLeft 
             timeLeft -= 15;
             resultFooter.textContent = 'You are WRONG!';
-            main.appendChild(resultFooter);
         };
+        main.appendChild(resultFooter);
         questionEl.innerHTML = "";
     };
 };
 
 // function to set score in localStorage 
-// QUESTION: do we need to store and display more than one scores?
 function setScores (initials){
     resultEl.innerHTML = "";
-    
 
     const scores = (() => {
         const studentGrades = localStorage.getItem('studentGrades');
@@ -219,26 +215,29 @@ function setScores (initials){
 
 }
 
+// function that display list of scores
 function displayScores(){
     h3Result.textContent = "Here is your score(s):";
     resultEl.append(h3Result);
 
+    // retrieving scores from the local storage
     var scores = JSON.parse(localStorage.getItem('studentGrades'));
-    console.log(scores);
+    // check if there's any scores in localStorage and run for loop to list the score and append them to the ol element
     if (scores !== null){
-    for (var i=0; i<scores.length;i++){
-        var score = document.createElement("li");
-        score.className = "list-scores";
-        score.textContent = scores[i].initials + ' - ' + scores[i].score;
-        listScores.append(score);
-    }
-    resultEl.append(listScores);
+        for (var i=0; i<scores.length;i++){
+            var score = document.createElement("li");
+            score.className = "list-scores";
+            score.textContent = scores[i].initials + ' - ' + scores[i].score;
+            listScores.append(score);
+        }
+        resultEl.append(listScores);
     }else{
+        // return "No scores available" if there is not any data in localStorage
         pResult.textContent = "No scores available";
         resultEl.append(pResult);
     }
 
-
+    // restart button
     var backButt = document.createElement("button");
     backButt.textContent = "Restart";
     backButt.className = "buttons-display-scores";
@@ -246,6 +245,7 @@ function displayScores(){
         location.reload();
     })
 
+    // clear scores button
     var clearButt = document.createElement("button");
     clearButt.textContent = "Clear Scores";
     clearButt.className = "buttons-display-scores";
@@ -276,7 +276,6 @@ document.addEventListener("click",function(event){
 document.addEventListener("click",function(event){
     if(event.target && event.target.className== 'initials-button'){
         var initials = document.getElementById("myInitial").value;
-        console.log('myInitials: ' + initials);
         setScores(initials);
     }   
 });
