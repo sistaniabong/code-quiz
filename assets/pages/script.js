@@ -4,13 +4,14 @@ listScores.className = "ol-scores";
 var h3Result = document.createElement("h3");
 var pResult = document.createElement("p");
 
+
+// fucntion to display scores when the user is redirected to View Highscores
 function displayScores(){
-    // for loop to diplay list of scores and initials
+    
     h3Result.textContent = "Here is your score(s):";
     mainEl.append(h3Result);
-
+    // for loop to diplay list of scores and initials
     var scores = JSON.parse(localStorage.getItem('studentGrades'));
-    console.log(scores);
     if (scores !== null){
         for (var i=0; i<scores.length;i++){
             var score = document.createElement("li");
@@ -26,5 +27,6 @@ function displayScores(){
 
 
 }
+// call displayScores to render scores
 displayScores();
 
